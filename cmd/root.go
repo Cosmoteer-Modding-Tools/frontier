@@ -13,7 +13,7 @@ import (
 )
 
 func getFrontierVersion() (string, error) {
-	res, err := http.Get("https://raw.githubusercontent.com/Cosmoteer-Modding-Tools/frontier/version.txt")
+	res, err := http.Get("https://raw.githubusercontent.com/Cosmoteer-Modding-Tools/frontier/refs/heads/main/version.txt")
 	if err != nil {
 		return "", err
 	}

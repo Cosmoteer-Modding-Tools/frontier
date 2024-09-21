@@ -29,17 +29,14 @@ func getFrontierVersion() (string, error) {
 	return string(version), nil
 }
 
-var (
-	version     fr.Version
-	offlineMode bool = false
-)
+var version fr.Version
 
 var RootCmd = &cobra.Command{
 	Use:   "Frontier",
 	Short: "Frontier is a application to (hopefully) make Cosmoteer modding slightly easier",
 }
 
-func Execute() {
+func Execute(offlineMode *bool) {
 	dir, err := fr.GetHomeDir()
 	if err != nil {
 		fmt.Println(err.Error())
@@ -48,7 +45,7 @@ func Execute() {
 
 	var remoteVersion fr.Version
 
-	if !offlineMode {
+	if !*offlineMode {
 		remoteVersionText, err := getFrontierVersion()
 		if err != nil {
 			fmt.Println(err.Error())
@@ -65,7 +62,7 @@ func Execute() {
 	vpath := path.Join(path.Clean(dir), ".frontierversion")
 	content, err := fr.ReadFile(vpath)
 	if err != nil {
-		if fr.ErrorIsFile404(err) && !offlineMode {
+		if fr.ErrorIsFile404(err) && !*offlineMode {
 			fr.WriteFile(vpath, remoteVersion.Fmt())
 		} else {
 			fmt.Println(err.Error())
@@ -73,20 +70,36 @@ func Execute() {
 		}
 	}
 
+	canWriteVersion := false
+	versionToWrite := ""
+	defer func(path string, cwv *bool, v *string) {
+		if *cwv {
+			err := fr.WriteFile(path, *v)
+			if err != nil {
+				fmt.Println(err.Error())
+				os.Exit(1)
+			}
+		}
+	}(vpath, &canWriteVersion, &versionToWrite)
+
 	localVersion, err := fr.NewVersionFromVersionString(strings.TrimSpace(content))
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
 
-	if offlineMode {
+	if *offlineMode {
+		canWriteVersion = true
 		remoteVersion = localVersion
 	}
 
-	if localVersion.Compare(remoteVersion) == -1 {
+	if localVersion.Compare(remoteVersion) == -1 && !*offlineMode {
 		fmt.Println("A new Frontier version is available!\nTo install it, run `go install github.com/Cosmoteer-Modding-Tools/frontier@latest`")
 		os.Exit(1)
 	}
+
+	canWriteVersion = true
+	versionToWrite = remoteVersion.Fmt()
 
 	if err := RootCmd.Execute(); err != nil {
 		fmt.Println(err.Error())
@@ -95,4 +108,5 @@ func Execute() {
 }
 
 func init() {
+	RootCmd.Flags().Bool("offline", false, "If given, Frontier will not check for a new version, which needs an internet connection")
 }

@@ -1,7 +1,13 @@
 package main
 
-import "github.com/voidwyrm-2/frontier/cmd"
+import (
+	"flag"
+
+	"github.com/voidwyrm-2/frontier/cmd"
+)
 
 func main() {
-	cmd.Execute()
+	offlineModeFlag := flag.Bool("offline", false, "")
+	flag.Parse()
+	cmd.Execute(offlineModeFlag)
 }

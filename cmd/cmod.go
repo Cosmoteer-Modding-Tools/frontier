@@ -12,5 +12,9 @@ import (
 
 var cmod = &cobra.Command{
 	Use:   "cmod",
-	Short: "",
+	Short: "Commands related to mod structure and management",
+}
+
+func init() {
+	RootCmd.AddCommand(cmod)
 }

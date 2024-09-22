@@ -62,7 +62,11 @@ func Execute(offlineMode *bool) {
 	vpath := path.Join(path.Clean(dir), ".frontierversion")
 	content, err := fr.ReadFile(vpath)
 	if err != nil {
-		if fr.ErrorIsFile404(err) && !*offlineMode {
+		if fr.ErrorIsFile404(err) {
+			if *offlineMode {
+				fmt.Println("The current Frontier version has not been saved, disable offline mode to do so")
+				os.Exit(1)
+			}
 			fr.WriteFile(vpath, remoteVersion.Fmt())
 		} else {
 			fmt.Println(err.Error())

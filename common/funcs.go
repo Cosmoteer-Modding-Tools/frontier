@@ -76,6 +76,18 @@ func Readline(msg string) string {
 	return scanner.Text()
 }
 
+func ReadNonemptyLine(msg, msgWhenEmpty string) string {
+	fmt.Print(msg)
+	for {
+		reply := strings.TrimSpace(Readline(""))
+		if reply == "" {
+			fmt.Println(msgWhenEmpty)
+			continue
+		}
+		return reply
+	}
+}
+
 func DoesItemExist(item string) bool {
 	check := `printf "if [ -f "` + item + `" ] || [ -d "` + item + `" ]; then\necho "true"\nelse\necho "false"\nfi" | sh`
 	if strings.ToLower(runtime.GOOS) == "windows" {

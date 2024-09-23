@@ -7,7 +7,7 @@ import (
 	//"strings"
 
 	"github.com/spf13/cobra"
-	// fr "github.com/voidwyrm-2/frontier/common"
+	// fr "github.com/Cosmoteer-Modding-Tools/frontier/common"
 )
 
 var cmod = &cobra.Command{

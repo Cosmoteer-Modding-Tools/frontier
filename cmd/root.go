@@ -8,8 +8,8 @@ import (
 	"path"
 	"strings"
 
+	fr "github.com/Cosmoteer-Modding-Tools/frontier/common"
 	"github.com/spf13/cobra"
-	fr "github.com/voidwyrm-2/frontier/common"
 )
 
 func getFrontierVersion() (string, error) {

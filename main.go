@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 
-	"github.com/voidwyrm-2/frontier/cmd"
+	"github.com/Cosmoteer-Modding-Tools/frontier/cmd"
 )
 
 func main() {

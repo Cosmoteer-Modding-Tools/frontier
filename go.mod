@@ -1,4 +1,4 @@
-module github.com/voidwyrm-2/frontier
+module github.com/Cosmoteer-Modding-Tools/frontier
 
 go 1.22.2
 

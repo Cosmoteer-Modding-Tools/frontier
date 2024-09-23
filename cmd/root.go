@@ -74,18 +74,6 @@ func Execute(offlineMode *bool) {
 		}
 	}
 
-	canWriteVersion := false
-	versionToWrite := ""
-	defer func(path string, cwv *bool, v *string) {
-		if *cwv {
-			err := fr.WriteFile(path, *v)
-			if err != nil {
-				fmt.Println(err.Error())
-				os.Exit(1)
-			}
-		}
-	}(vpath, &canWriteVersion, &versionToWrite)
-
 	localVersion, err := fr.NewVersionFromVersionString(strings.TrimSpace(content))
 	if err != nil {
 		fmt.Println(err.Error())
@@ -93,17 +81,13 @@ func Execute(offlineMode *bool) {
 	}
 
 	if *offlineMode {
-		canWriteVersion = true
 		remoteVersion = localVersion
 	}
 
 	if localVersion.Compare(remoteVersion) == -1 && !*offlineMode {
-		fmt.Println("A new Frontier version is available!\nTo install it, run `go install github.com/Cosmoteer-Modding-Tools/frontier@latest`")
+		fmt.Println("A new Frontier version is available!\nTo install it, run `frontier upgrade`")
 		os.Exit(1)
 	}
-
-	canWriteVersion = true
-	versionToWrite = remoteVersion.Fmt()
 
 	if err := RootCmd.Execute(); err != nil {
 		fmt.Println(err.Error())

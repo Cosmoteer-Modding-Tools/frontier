@@ -14,6 +14,15 @@ var upgrade = &cobra.Command{
 	Use:   "upgrade",
 	Short: "Updates Frontier",
 	Run: func(cmd *cobra.Command, args []string) {
+		needsUpdate, err := fr.CheckForFrontierUpdate()
+		if err != nil {
+			fmt.Println(err.Error())
+			os.Exit(1)
+		} else if !needsUpdate {
+			fmt.Println("Frontier is up to date")
+			os.Exit(0)
+		}
+
 		_, oe, err := fr.RunCommand("go install \"github.com/Cosmoteer-Modding-Tools/frontier@latest\"", []string{})
 		if oe != "" {
 			fmt.Println("error while updating Frontier:")
@@ -25,7 +34,7 @@ var upgrade = &cobra.Command{
 			os.Exit(1)
 		}
 
-		remoteVersionText, err := getFrontierVersion()
+		remoteVersionText, err := fr.GetFrontierVersion()
 		if err != nil {
 			fmt.Println(err.Error())
 			os.Exit(1)

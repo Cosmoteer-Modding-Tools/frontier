@@ -4,9 +4,12 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"os/exec"
 	"os/user"
+	"path"
 	"runtime"
 	"strings"
 )
@@ -98,4 +101,59 @@ func DoesItemExist(item string) bool {
 		return false
 	}
 	return strings.TrimSpace(strings.ToLower(so)) == "true"
+}
+
+func GetFrontierVersion() (string, error) {
+	res, err := http.Get("https://raw.githubusercontent.com/Cosmoteer-Modding-Tools/frontier/refs/heads/main/version.txt")
+	if err != nil {
+		return "", err
+	}
+
+	version, err := io.ReadAll(res.Body)
+	res.Body.Close()
+	if err != nil {
+		return "", err
+	} else if string(version) == "404: Not Found" {
+		return "", err
+	}
+
+	return string(version), nil
+}
+
+func CheckForFrontierUpdate() (bool, error) {
+	dir, err := GetHomeDir()
+	if err != nil {
+		return false, err
+	}
+
+	var remoteVersion Version
+
+	remoteVersionText, err := GetFrontierVersion()
+	if err != nil {
+		return false, err
+	}
+
+	remoteVersion, err = NewVersionFromVersionString(remoteVersionText)
+	if err != nil {
+		return false, err
+	}
+
+	vpath := path.Join(path.Clean(dir), ".frontierversion")
+	content, err := ReadFile(vpath)
+	if err != nil {
+		if ErrorIsFile404(err) {
+			if err := WriteFile(vpath, remoteVersion.Fmt()); err != nil {
+				return false, err
+			}
+		} else {
+			return false, err
+		}
+	}
+
+	localVersion, err := NewVersionFromVersionString(strings.TrimSpace(content))
+	if err != nil {
+		return false, err
+	}
+
+	return localVersion.Compare(remoteVersion) == -1, nil
 }

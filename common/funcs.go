@@ -120,22 +120,22 @@ func GetFrontierVersion() (string, error) {
 	return string(version), nil
 }
 
-func CheckForFrontierUpdate() (bool, error) {
+func CheckForFrontierUpdate() (bool, [2]Version, error) {
 	dir, err := GetHomeDir()
 	if err != nil {
-		return false, err
+		return false, [2]Version{}, err
 	}
 
 	var remoteVersion Version
 
 	remoteVersionText, err := GetFrontierVersion()
 	if err != nil {
-		return false, err
+		return false, [2]Version{}, err
 	}
 
 	remoteVersion, err = NewVersionFromVersionString(remoteVersionText)
 	if err != nil {
-		return false, err
+		return false, [2]Version{}, err
 	}
 
 	vpath := path.Join(path.Clean(dir), ".frontierversion")
@@ -143,17 +143,17 @@ func CheckForFrontierUpdate() (bool, error) {
 	if err != nil {
 		if ErrorIsFile404(err) {
 			if err := WriteFile(vpath, remoteVersion.Fmt()); err != nil {
-				return false, err
+				return false, [2]Version{}, err
 			}
 		} else {
-			return false, err
+			return false, [2]Version{}, err
 		}
 	}
 
 	localVersion, err := NewVersionFromVersionString(strings.TrimSpace(content))
 	if err != nil {
-		return false, err
+		return false, [2]Version{}, err
 	}
 
-	return localVersion.Compare(remoteVersion) == -1, nil
+	return localVersion.Compare(remoteVersion) == -1, [2]Version{localVersion, remoteVersion}, nil
 }

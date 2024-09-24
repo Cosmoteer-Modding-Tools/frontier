@@ -17,13 +17,13 @@ var RootCmd = &cobra.Command{
 
 func Execute(offlineMode *bool) {
 	if !*offlineMode {
-		needsUpdate, err := fr.CheckForFrontierUpdate()
+		needsUpdate, versions, err := fr.CheckForFrontierUpdate()
 		if err != nil {
 			fmt.Println(err.Error())
 			os.Exit(1)
 		}
 		if needsUpdate {
-			fmt.Println("A new Frontier version is available!\nTo install it, run `frontier upgrade`")
+			fmt.Println("A new Frontier version is available!(" + versions[0].Fmt() + " -> " + versions[1].Fmt() + ")\nTo install it, run `frontier upgrade`")
 			os.Exit(1)
 		}
 	}

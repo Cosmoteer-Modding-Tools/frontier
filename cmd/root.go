@@ -8,8 +8,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var version fr.Version
-
 var RootCmd = &cobra.Command{
 	Use:   "Frontier",
 	Short: "Frontier is a application to (hopefully) make Cosmoteer modding slightly easier",

@@ -59,7 +59,7 @@ func ErrorIsFile404(err error) bool {
 	return strings.HasSuffix(strings.ToLower(err.Error()), ": no such file or directory") || strings.HasSuffix(strings.ToLower(err.Error()), ": The system cannot find the file specified.")
 }
 
-func RunCommand(command string, args []string) (string, string, error) {
+func RunCommand(command string, args ...string) (string, string, error) {
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
 
@@ -92,11 +92,14 @@ func ReadNonemptyLine(msg, msgWhenEmpty string) string {
 }
 
 func DoesItemExist(item string) bool {
-	check := `printf "if [ -f "` + item + `" ] || [ -d "` + item + `" ]; then\necho "true"\nelse\necho "false"\nfi" | sh`
+	checkCmd := "sh"
+	check := []string{"-c",
+		`"if [ -f \\"` + item + `\\" ] || [ -d \\"` + item + `\\" ]; then echo \\"true\\" fi"`}
 	if strings.ToLower(runtime.GOOS) == "windows" {
-		check = "Test-Path " + item
+		checkCmd = "Test-Path"
+		check = []string{item}
 	}
-	so, se, err := RunCommand(check, []string{})
+	so, se, err := RunCommand(checkCmd, check...)
 	if se != "" || err != nil {
 		return false
 	}

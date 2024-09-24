@@ -19,7 +19,7 @@ var cmod_init = &cobra.Command{
 			ar := strings.TrimSpace(args[0])
 			if ar != "" {
 				if !fr.DoesItemExist(ar) {
-					_, oe, err := fr.RunCommand("mkdir "+ar, []string{})
+					_, oe, err := fr.RunCommand("mkdir", ar)
 					if oe != "" {
 						fmt.Println(oe)
 						os.Exit(1)
@@ -67,7 +67,7 @@ Actions
 			}
 
 			if !fr.DoesItemExist(path.Join(pprefix, modStringsFolder)) {
-				_, oe, err := fr.RunCommand("mkdir "+path.Join(pprefix, modStringsFolder), []string{})
+				_, oe, err := fr.RunCommand("mkdir", path.Join(pprefix, modStringsFolder))
 				if oe != "" {
 					fmt.Println(oe)
 					os.Exit(1)

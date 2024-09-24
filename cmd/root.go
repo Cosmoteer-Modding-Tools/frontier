@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"slices"
 
 	fr "github.com/Cosmoteer-Modding-Tools/frontier/common"
 	"github.com/spf13/cobra"
@@ -14,7 +15,7 @@ var RootCmd = &cobra.Command{
 }
 
 func Execute(offlineMode *bool) {
-	if !*offlineMode {
+	if !*offlineMode && !slices.Contains(os.Args[1:], "upgrade") {
 		needsUpdate, versions, err := fr.CheckForFrontierUpdate()
 		if err != nil {
 			fmt.Println(err.Error())
